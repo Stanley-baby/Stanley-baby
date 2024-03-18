@@ -3,7 +3,7 @@ name: generate animation
 on:
   # run automatically every 24 hours
   schedule:
-    - cron: "0 */24 * * *" 
+    - cron: "0 */24 * * *"
 
   # allows to manually run the job at any time
   workflow_dispatch:
@@ -12,8 +12,6 @@ on:
   push:
     branches:
     - main
-
-
 
 jobs:
   generate:
@@ -32,13 +30,27 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Clone Repository
+        uses: actions/checkout@v3
+
+      - name: Git Setup
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email '<stanley270034@gmail.com>'
+
+      - name: Git Checkout Output Branch
+        run: |
+          git fetch origin output
+          git checkout output
+          git pull
 
       # push the content of <build_dir> to a branch
       # the content will be available at https://raw.githubusercontent.com/<github_user>/<repository>/<target_branch>/<file> , or as github page
-      - name: push github-contribution-grid-snake.svg to the output branch
+      - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v4
         with:
           target_branch: output
           build_dir: dist
+          force-orphan: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
